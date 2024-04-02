@@ -10,6 +10,7 @@ from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyAccessTokenDatabase,
     SQLAlchemyBaseAccessTokenTable,
 )
+from src.cats.models import Cat
 
 
 class User(SQLAlchemyBaseUserTable[int], Base):

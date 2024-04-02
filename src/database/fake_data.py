@@ -1,26 +1,29 @@
+from src.utils import create_file_field
+
+
 HERO_DATA = {
     "title": "Подаруй дім для маленьких хвостиків",
     "sub_title": "Вони чекають на тебе",
-    "media_path": "static/hero/main_photo.png",
+    "media_path": create_file_field("static/hero/main_photo.png"),
     "left_text": "Наша місія проста, але могутня",
     "right_text": "Опікуємось котами, які поруч з нами переживають буремні часи. Прилаштовуємо у добрі руки.",
 }
 DOCUMENTS_DATA = [
     {
         "name": "Рекомендації по утриманню тварин",
-        "media_path": "static/documents/example.pdf",
+        "media_path": create_file_field("static/documents/example.pdf"),
     },
     {
         "name": "Політика конфіденційності",
-        "media_path": "static/documents/privacy_policy.pdf",
+        "media_path": create_file_field("static/documents/privacy_policy.pdf"),
     },
     {
         "name": "Правила користування сайтом",
-        "media_path": "static/documents/terms_of_use_site.pdf",
+        "media_path": create_file_field("static/documents/terms_of_use_site.pdf"),
     },
     {
         "name": "Звітність",
-        "media_path": "static/documents/example.pdf",
+        "media_path": create_file_field("static/documents/example.pdf"),
     },
 ]
 INSTRUCTIONS_DATA = [

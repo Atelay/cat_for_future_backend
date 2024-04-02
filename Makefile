@@ -9,7 +9,11 @@ down:
 
 build:
 	docker compose up -d --build --scale postgres_tests=0
-	
+
+fake_data:
+	python3 -m scripts.add_data
+	@echo "fake data has added successfully"
+
 run: down
 	docker compose up postgres redis -d
 	@while true; do \
@@ -22,6 +26,7 @@ run: down
 		fi; \
 	done
 	alembic upgrade head
+	make fake_data
 	make start
 
 start:

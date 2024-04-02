@@ -1,13 +1,14 @@
 import contextlib
 
-from fastapi_users.exceptions import UserAlreadyExists
+from fastapi_users.password import PasswordHelper
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_mail import FastMail, MessageSchema
 
+from src.auth.models import User
 from src.database.database import get_async_session
 from src.config import mail_config, settings
 from .exceptions import EMAIL_BODY, USER_EXISTS
 from .manager import get_user_db, get_user_manager
-from .schemas import UserCreate
 
 
 get_async_session_context = contextlib.asynccontextmanager(get_async_session)
@@ -15,26 +16,15 @@ get_user_db_context = contextlib.asynccontextmanager(get_user_db)
 get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)
 
 
-async def create_user(email: str, password: str):
-    try:
-        async with get_async_session_context() as session:
-            async with get_user_db_context(session) as user_db:
-                async with get_user_manager_context(user_db) as user_manager:
-                    user = await user_manager.create(
-                        UserCreate(
-                            email=email,
-                            password=password,
-                            is_superuser=True,
-                            is_active=True,
-                            is_verified=True,
-                            name="Administrator",
-                            phone="+38000000000",
-                        )
-                    )
-                    session.add(user)
-                    await session.commit()
-    except UserAlreadyExists:
-        print(USER_EXISTS % email)
+def add_user_data(email: str, password: str, session: AsyncSession):
+    instance = User(
+        email=email,
+        hashed_password=PasswordHelper().hash(password),
+        is_superuser=True,
+        is_active=True,
+        is_verified=True,
+    )
+    session.add(instance)
 
 
 async def send_reset_email(email: str, token: str):

@@ -13,3 +13,5 @@ redis==4.4.2
 sqladmin[full]==0.16.1
 pytest-asyncio==0.23.4
 fastapi-limiter==0.1.6
+fastapi-storages==0.2.1
+beautifulsoup4

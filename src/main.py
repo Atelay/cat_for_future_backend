@@ -23,7 +23,6 @@ from src.instructions.routers import instructions_router
 from src.documents.routers import documents_router
 from src.contacts.routers import contacts_router, feedback_router
 from src.donate.routers import donate_router
-from src.utils import lifespan
 from src.database.database import engine
 from src.admin.auth import authentication_backend
 
@@ -31,7 +30,6 @@ from src.admin.auth import authentication_backend
 app = FastAPI(
     swagger_ui_parameters=SWAGGER_PARAMETERS,
     title=PROJECT_NAME,
-    lifespan=lifespan,
 )
 
 admin = Admin(app, engine, authentication_backend=authentication_backend)

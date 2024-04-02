@@ -9,14 +9,16 @@ Create Date: 2024-01-21 14:00:54.358020
 from typing import Sequence, Union
 
 from alembic import op
+from fastapi_storages import FileSystemStorage
 import sqlalchemy as sa
-
+from fastapi_storages.integrations.sqlalchemy import FileType
 
 # revision identifiers, used by Alembic.
 revision: str = "178c4abbeed3"
 down_revision: Union[str, None] = "5356a24cac6d"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
+storage = FileSystemStorage(path="static/media/hero")
 
 
 def upgrade() -> None:
@@ -26,7 +28,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("title", sa.String(length=200), nullable=False),
         sa.Column("sub_title", sa.String(length=200), nullable=False),
-        sa.Column("media_path", sa.String(length=500), nullable=False),
+        sa.Column("media_path", FileType(storage), nullable=False),
         sa.Column("left_text", sa.String(length=200), nullable=False),
         sa.Column("right_text", sa.String(length=200), nullable=False),
         sa.PrimaryKeyConstraint("id"),
