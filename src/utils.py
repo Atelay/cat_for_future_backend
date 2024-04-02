@@ -1,3 +1,4 @@
+from io import BytesIO
 import os
 import shutil
 from typing import Type
@@ -65,7 +66,7 @@ def clear_media_path():
 
 async def save_photo(
     file: UploadFile,
-    model: Type[Base],
+    model,
     background_tasks: BackgroundTasks,
     is_file=False,
 ) -> str:
@@ -106,7 +107,7 @@ async def delete_photo(path: str, background_tasks: BackgroundTasks) -> None:
 
 async def update_photo(
     file: UploadFile,
-    record: Type[Base],
+    record,
     field_name: str,
     background_tasks: BackgroundTasks,
     is_file=False,
@@ -116,3 +117,50 @@ async def update_photo(
     if old_photo_path:
         await delete_photo(old_photo_path, background_tasks)
     return new_photo
+
+
+# def save_photo(
+#     file: str,
+#     model,
+#     image_extension: str,
+# ) -> str:
+#     folder_path = os.path.join(
+#         "static", "media", model.__tablename__.lower().replace(" ", "_")
+#     )
+#     file_name = generate_file_name(image_extension=image_extension)
+#     file_path = os.path.join(folder_path, file_name)
+
+#     async def _save_photo(file_path: str):
+#         os.makedirs(folder_path, exist_ok=True)
+#         async with aiofiles.open(file_path, "wb") as buffer:
+#             await buffer.write(file)
+
+#     loop = asyncio.get_event_loop()
+#     loop.create_task(_save_photo(file_path))
+#     return file_path
+
+
+def generate_file_name(filepath: str = None, image_extension: str = None):
+    "file or image_extension with <.>"
+    name = uuid4().hex
+    if not image_extension:
+        image_extension = "." + filepath.split("/")[-1].split(".")[-1]
+    return name + image_extension
+
+
+def create_file_field(file_path: str) -> UploadFile:
+    file_name = generate_file_name(file_path)
+    with open(file_path, "rb") as buffer:
+        file_bytes = buffer.read()
+    return UploadFile(file=BytesIO(file_bytes), filename=file_name)
+
+
+# def delete_photo(path: str) -> None:
+#     async def _delete_photo(path):
+#         if path and "media" in path:
+#             path_exists = os.path.exists(path)
+#             if path_exists:
+#                 os.remove(path)
+
+#     loop = asyncio.get_event_loop()
+#     loop.create_task(_delete_photo(path))

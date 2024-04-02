@@ -1,34 +1,45 @@
-from sqladmin import ModelView
-from wtforms import Form, StringField, FileField
-
+from src.admin.commons.exceptions import IMG_REQ
+from src.admin.commons.formatters import MediaFormatter
+from src.admin.commons.utils import MediaInputWidget
+from src.admin.commons.validators import MediaValidator
+from src.config import IMAGE_TYPES, MAX_IMAGE_SIZE_MB
 from src.hero.models import Hero
+from src.admin.commons.base import BaseAdmin
 
 
-class MyForm(Form):
-    title = StringField("Заголовок")
-    sub_title = StringField("Підзаголовок")
-    media_path = FileField("Фото")
-    left_text = StringField("Текст1")
-    right_text = StringField("Текст2")
+class HeroAdmin(BaseAdmin, model=Hero):
+    name_plural = "Hero"
 
-
-class HeroAdmin(ModelView, model=Hero):
-    name_plural = "Hero section"
-
-    column_list = [
-        "title",
-        "sub_title",
-        "media_path",
-        "left_text",
-        "right_text",
-    ]
-    column_labels = {
-        "title": "Заголовок",
-        "sub_title": "Підзаголовок",
-        "media_path": "Фото",
-        "left_text": "Текст1",
-        "right_text": "Текст2",
-    }
     can_create = False
     can_delete = False
-    can_export = False
+
+    column_labels = {
+        Hero.title: "Title",
+        Hero.sub_title: "Sub-title",
+        Hero.left_text: "Left-text",
+        Hero.right_text: "Right-text",
+        Hero.media_path: "Photo",
+    }
+    column_exclude_list = column_details_exclude_list = [
+        Hero.id,
+    ]
+
+    column_formatters = {
+        Hero.media_path: MediaFormatter(),
+    }
+    form_files_list = [
+        Hero.media_path,
+    ]
+    form_args = {
+        "photo": {
+            "widget": MediaInputWidget(is_required=True),
+            "validators": [
+                MediaValidator(
+                    media_types=IMAGE_TYPES,
+                    max_size=MAX_IMAGE_SIZE_MB,
+                    is_required=True,
+                ),
+            ],
+            "description": IMG_REQ % (1440, 883),
+        },
+    }

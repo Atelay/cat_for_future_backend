@@ -11,6 +11,13 @@ PHOTO_FORMATS = [
 FILE_FORMATS = [
     "application/pdf",
 ]
+IMAGE_TYPES = [
+    "image/webp",
+    "image/png",
+    "image/jpeg",
+]
+
+MAX_IMAGE_SIZE_MB = 1
 
 MAX_FILE_SIZE_MB = 3
 

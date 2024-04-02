@@ -16,16 +16,3 @@ async def get_hero(
 ):
     record = await get_hero_record(session=session)
     return record
-
-
-@hero_router.patch("", response_model=GetHeroSchema)
-async def patch_hero(
-    background_tasks: BackgroundTasks,
-    schema: UpdateHeroSchema = Depends(UpdateHeroSchema.as_form),
-    session: AsyncSession = Depends(get_async_session),
-    user: User = Depends(CURRENT_SUPERUSER),
-):
-    record = await update_hero_record(
-        schema=schema, session=session, background_tasks=background_tasks
-    )
-    return record
