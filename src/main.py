@@ -14,7 +14,7 @@ from src.config import (
     API_PREFIX,
 )
 from src.admin import __all__ as views
-from src.auth.routers import auth_router
+from src.auth.routers import auth_router, oauth2
 from src.user.routers import user_router
 from src.hero.routers import hero_router
 from src.stories.routers import stories_router
@@ -48,6 +48,7 @@ api_routers = [
     contacts_router,
     feedback_router,
     donate_router,
+    oauth2,
 ]
 
 [app.include_router(router, prefix=API_PREFIX) for router in api_routers]

@@ -17,9 +17,11 @@ from fastapi_users import models
 from fastapi_users.manager import BaseUserManager
 from fastapi_users.router.reset import RESET_PASSWORD_RESPONSES
 
+from src.auth.schemas import UserRead
+from src.config import google_oauth_client
 from src.database.database import get_async_session
 from .responses import login_responses, logout_responses, is_accessible_resposes
-from .auth_config import CURRENT_USER, auth_backend
+from .auth_config import CURRENT_USER, auth_backend, fastapi_users
 from .models import User
 from .manager import get_user_manager
 from .service import (
@@ -34,6 +36,7 @@ from .service import (
 
 
 auth_router = APIRouter(prefix="/auth", tags=["Auth"])
+oauth2 = APIRouter(prefix="/oauth", tags=["OAuth2"])
 
 
 @auth_router.post("/login", responses=login_responses)
@@ -105,3 +108,13 @@ async def change_password(
 )
 async def check(user_token: Tuple[models.UP, str] = Depends(get_current_user_token)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+oauth2.include_router(
+    fastapi_users.get_oauth_router(google_oauth_client, auth_backend, "SECRET"),
+    prefix="/auth/google",
+)
+oauth2.include_router(
+    fastapi_users.get_oauth_associate_router(google_oauth_client, UserRead, "SECRET"),
+    prefix="/auth/associate/google",
+)

@@ -1,8 +1,11 @@
 from fastapi import Depends
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
+from fastapi_users_db_sqlalchemy import (
+    SQLAlchemyBaseUserTable,
+    SQLAlchemyBaseOAuthAccountTable,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
 from src.database.database import Base, get_async_session
 from sqlalchemy.orm import declared_attr
@@ -24,6 +27,17 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_superuser: bool = Column(Boolean, default=False, nullable=False)
     is_verified: bool = Column(Boolean, default=False, nullable=False)
     cats = relationship("Cat", back_populates="user", passive_deletes=True)
+    oauth_accounts: Mapped[list["OAuthAccount"]] = relationship(lazy="joined")
+
+
+class OAuthAccount(SQLAlchemyBaseOAuthAccountTable[int], Base):
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    @declared_attr
+    def user_id(cls) -> Mapped[int]:
+        return mapped_column(
+            Integer, ForeignKey("user.id", ondelete="cascade"), nullable=False
+        )
 
 
 class AccessToken(SQLAlchemyBaseAccessTokenTable[int], Base):
