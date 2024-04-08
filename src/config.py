@@ -1,5 +1,6 @@
 from fastapi_mail import ConnectionConfig
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from httpx_oauth.clients.google import GoogleOAuth2
 
 
 PHOTO_FORMATS = [
@@ -41,10 +42,15 @@ class Settings(BaseSettings):
     BASE_URL: str
     SITE_URL: str
 
+    CLIENT_ID: str
+    CLIENT_SECRET: str
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 settings = Settings()
+
+google_oauth_client = GoogleOAuth2(settings.CLIENT_ID, settings.CLIENT_SECRET)
 settings.POSTGRES_PORT = "5432"
 settings.REDIS_PORT = "6379"
 

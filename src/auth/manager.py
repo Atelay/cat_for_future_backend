@@ -15,7 +15,7 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_users.jwt import generate_jwt, decode_jwt
 
-from .models import AccessToken, User
+from .models import AccessToken, OAuthAccount, User
 from src.config import settings
 from src.database.database import get_async_session
 from src.auth.schemas import UserCreate
@@ -151,7 +151,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
-    yield SQLAlchemyUserDatabase(session, User)
+    yield SQLAlchemyUserDatabase(session, User, OAuthAccount)
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):
