@@ -51,6 +51,7 @@ class Settings(BaseSettings):
 settings = Settings()
 
 google_oauth_client = GoogleOAuth2(settings.CLIENT_ID, settings.CLIENT_SECRET)
+
 settings.POSTGRES_PORT = "5432"
 settings.REDIS_PORT = "6379"
 
