@@ -4,11 +4,9 @@ from fastapi_users_db_sqlalchemy import (
     SQLAlchemyBaseOAuthAccountTable,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm import relationship, Mapped, mapped_column, declared_attr
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
 from src.database.database import Base, get_async_session
-from sqlalchemy.orm import declared_attr
 from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyAccessTokenDatabase,
     SQLAlchemyBaseAccessTokenTable,

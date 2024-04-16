@@ -1,7 +1,6 @@
 from typing import List
-from fastapi import APIRouter, BackgroundTasks, Depends, File, UploadFile
 
-# from fastapi_pagination import Page, paginate
+from fastapi import APIRouter, BackgroundTasks, Depends, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.auth_config import CURRENT_USER, CURRENT_SUPERUSER

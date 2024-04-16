@@ -54,8 +54,6 @@ async def logout(
     user_token: Tuple[models.UP, str] = Depends(get_current_user_token),
     strategy: Strategy[models.UP, models.ID] = Depends(auth_backend.get_strategy),
 ):
-    # user, _ = user_token
-    # await invalidate_cache("get_me", user.email)
     return await process_logout(user_token, strategy)
 
 
