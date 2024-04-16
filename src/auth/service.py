@@ -14,11 +14,9 @@ from .auth_config import auth_backend
 from .models import AccessToken, User
 from .manager import get_user_manager
 from .exceptions import (
-    DB_ERROR,
     OLD_PASS_INCORRECT,
     PASSWORD_CHANGE_SUCCESS,
     PASSWORD_NOT_MATCH,
-    UNIQUE_ERROR,
 )
 
 
