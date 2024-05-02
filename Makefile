@@ -11,7 +11,7 @@ build:
 	docker compose up -d --build --scale postgres_tests=0
 	
 run: down
-	docker compose up postgres redis -d
+	docker compose up postgres redis prometheus grafana -d
 	@while true; do \
 		sleep 1; \
 		result_postgres=$$(docker inspect -f '{{json .State.Health.Status}}' postgres_cats); \
