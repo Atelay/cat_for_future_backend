@@ -27,6 +27,7 @@ from src.utils import lifespan
 from src.database.database import engine
 from src.admin.auth import authentication_backend
 from src.middlewares import logger_middleware, add_process_time_header
+from prometheus_fastapi_instrumentator import Instrumentator
 
 
 app = FastAPI(
@@ -34,6 +35,8 @@ app = FastAPI(
     title=PROJECT_NAME,
     lifespan=lifespan,
 )
+
+Instrumentator().instrument(app).expose(app)
 
 admin = Admin(app, engine, authentication_backend=authentication_backend)
 

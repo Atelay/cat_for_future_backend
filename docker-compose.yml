@@ -70,6 +70,26 @@ services:
     networks:
       - cats
 
+  prometheus:
+    image: prom/prometheus:v2.21.0
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - cats
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - cats
 networks:
   cats:
     driver: bridge
@@ -79,3 +99,5 @@ volumes:
   postgres_tests_data:
   redis_data:
   backend_data:
+  prometheus-data:
+  grafana_data:
