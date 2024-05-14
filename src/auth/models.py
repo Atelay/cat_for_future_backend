@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import Depends
 from fastapi_users_db_sqlalchemy import (
     SQLAlchemyBaseUserTable,
@@ -11,6 +12,7 @@ from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyAccessTokenDatabase,
     SQLAlchemyBaseAccessTokenTable,
 )
+from fastapi_users_db_sqlalchemy.generics import GUID, TIMESTAMPAware, now_utc
 
 
 class User(SQLAlchemyBaseUserTable[int], Base):
@@ -46,5 +48,22 @@ class AccessToken(SQLAlchemyBaseAccessTokenTable[int], Base):
         )
 
 
+class RefreshToken(Base):
+    __tablename__ = "refresh_token"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    token: Mapped[str] = mapped_column(String(1024), nullable=False, unique=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("user.id", ondelete="cascade")
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMPAware(timezone=True), index=True, nullable=False, default=now_utc
+    )
+
+
 async def get_access_token_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyAccessTokenDatabase(session, AccessToken)
+
+
+async def get_refresh_token_db(session: AsyncSession = Depends(get_async_session)):
+    yield SQLAlchemyAccessTokenDatabase(session, RefreshToken)

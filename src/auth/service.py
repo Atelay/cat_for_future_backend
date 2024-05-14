@@ -125,16 +125,22 @@ async def process_login(
     request: Request,
     credentials: OAuth2PasswordRequestForm,
     user_manager: BaseUserManager[models.UP, models.ID],
-    strategy: Strategy[models.UP, models.ID],
+    access_strategy: Strategy[models.UP, models.ID],
+    refresh_strategy: Strategy[models.UP, models.ID],
 ):
     user = await user_manager.authenticate(credentials)
 
     if user is None or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ErrorCode.LOGIN_BAD_CREDENTIALS,
+            detail="LOGIN_BAD_CREDENTIALS",
         )
-    response = await auth_backend.login(strategy, user)
+
+    access_token = await access_strategy.write_token(user)
+    refresh_token = await refresh_strategy.write_token(user)
+
+    response = {"access_token": access_token, "refresh_token": refresh_token}
+
     await user_manager.on_after_login(user, request, response)
     return response
 
@@ -145,3 +151,23 @@ async def process_logout(
 ):
     user, token = user_token
     return await auth_backend.logout(strategy, user, token)
+
+
+async def process_refresh(
+    refresh_token: str,
+    user_manager: BaseUserManager[models.UP, models.ID],
+    access_strategy: Strategy[models.UP, models.ID],
+    refresh_strategy: Strategy[models.UP, models.ID],
+    session: AsyncSession,
+):
+    user = await refresh_strategy.read_token(refresh_token, user_manager)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
+        )
+    # Invalidate the old access tokens
+    await user_manager.on_after_refresh_token(user, session)
+    # Create new access token
+    access_token = await access_strategy.write_token(user)
+    response = {"access_token": access_token}
+    return response

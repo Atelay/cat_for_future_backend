@@ -15,7 +15,7 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_users.jwt import generate_jwt, decode_jwt
 
-from .models import AccessToken, OAuthAccount, User
+from .models import AccessToken, OAuthAccount, RefreshToken, User
 from src.config import settings
 from src.database.database import get_async_session
 from src.auth.schemas import UserCreate
@@ -148,6 +148,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             status_code=200,
             detail={"status": "success", "message": PASSWORD_CHANGE_SUCCESS},
         )
+
+    async def on_after_refresh_token(self, user: User, session: AsyncSession) -> None:
+        await session.execute(delete(AccessToken).where(AccessToken.user_id == user.id))
+        await session.commit()
 
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):

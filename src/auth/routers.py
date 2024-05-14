@@ -21,7 +21,7 @@ from src.auth.schemas import UserRead
 from src.config import google_oauth_client
 from src.database.database import get_async_session
 from .responses import login_responses, logout_responses, is_accessible_resposes
-from .auth_config import CURRENT_USER, auth_backend, fastapi_users
+from .auth_config import CURRENT_USER, auth_backend, fastapi_users, refresh_auth_backend
 from .models import User
 from .manager import get_user_manager
 from .service import (
@@ -29,6 +29,7 @@ from .service import (
     process_forgot_password,
     process_login,
     process_logout,
+    process_refresh,
     process_reset_password,
     get_current_user_token,
     OAuth2PasswordRequestForm,
@@ -44,9 +45,16 @@ async def login(
     request: Request,
     credentials: OAuth2PasswordRequestForm = Depends(),
     user_manager: BaseUserManager[models.UP, models.ID] = Depends(get_user_manager),
-    strategy: Strategy[models.UP, models.ID] = Depends(auth_backend.get_strategy),
+    access_strategy: Strategy[models.UP, models.ID] = Depends(
+        auth_backend.get_strategy
+    ),
+    refresh_strategy: Strategy[models.UP, models.ID] = Depends(
+        refresh_auth_backend.get_strategy
+    ),
 ):
-    return await process_login(request, credentials, user_manager, strategy)
+    return await process_login(
+        request, credentials, user_manager, access_strategy, refresh_strategy
+    )
 
 
 @auth_router.post("/logout", responses=logout_responses)
@@ -55,6 +63,25 @@ async def logout(
     strategy: Strategy[models.UP, models.ID] = Depends(auth_backend.get_strategy),
 ):
     return await process_logout(user_token, strategy)
+
+
+@auth_router.post(
+    "/refresh", responses={200: {"description": "Refresh token generated"}}
+)
+async def refresh_token(
+    refresh_token: str = Form(...),
+    user_manager: BaseUserManager[models.UP, models.ID] = Depends(get_user_manager),
+    access_strategy: Strategy[models.UP, models.ID] = Depends(
+        auth_backend.get_strategy
+    ),
+    refresh_strategy: Strategy[models.UP, models.ID] = Depends(
+        refresh_auth_backend.get_strategy
+    ),
+    session: AsyncSession = Depends(get_async_session),
+):
+    return await process_refresh(
+        refresh_token, user_manager, access_strategy, refresh_strategy, session
+    )
 
 
 @auth_router.post("/forgot-password", status_code=status.HTTP_202_ACCEPTED)
