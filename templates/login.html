@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login with Google</h1>
+    <button onclick="loginWithGoogle()">Login with Google</button>
+
+    <script>
+        async function loginWithGoogle() {
+            const response = await fetch('/api/v1/oauth/auth/google/authorize');
+            const data = await response.json();
+            window.location.href = data.authorization_url;
+        }
+    </script>
+</body>
+</html>
